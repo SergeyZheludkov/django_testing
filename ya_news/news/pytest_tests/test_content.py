@@ -1,23 +1,17 @@
-import pytest
 from django.conf import settings
-from django.urls import reverse
 
 from news.forms import CommentForm
 
-HOME_URL = reverse('news:home')
 
-pytestmark = pytest.mark.django_db
-
-
-def test_news_count(client, news_bulk_creation):
-    response = client.get(HOME_URL)
+def test_news_count(client, news_bulk_creation, home_url):
+    response = client.get(home_url)
     object_list = response.context['object_list']
     news_count = object_list.count()
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-def test_news_order(client, news_bulk_creation):
-    response = client.get(HOME_URL)
+def test_news_order(client, news_bulk_creation, home_url):
+    response = client.get(home_url)
     object_list = response.context['object_list']
     all_dates = [news.date for news in object_list]
     sorted_dates = sorted(all_dates, reverse=True)
@@ -39,7 +33,7 @@ def test_anonymous_client_has_no_form(client, detail_url):
     assert 'form' not in response.context
 
 
-def test_authorized_client_has_form(client, author_client, detail_url):
+def test_authorized_client_has_form(author_client, detail_url):
     response = author_client.get(detail_url)
     assert 'form' in response.context
     assert isinstance(response.context['form'], CommentForm)
