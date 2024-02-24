@@ -8,30 +8,26 @@ from notes.tests.common_test import (
 
 class TestRoutes(SetUpTestData):
 
-    def test_pages_availability(self):
-        for client in (self.client, self.author_client):
-            for url in (URL_HOME, URL_LOGIN, URL_LOGOUT, URL_SIGNUP):
-                with self.subTest():
-                    response = client.get(url)
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_availability_for_authorised_user(self):
-        for url in (URL_ADD, URL_LIST, URL_DONE):
-            with self.subTest():
-                response = self.author_client.get(url)
-                self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_availability_for_edit_note_and_delete(self):
+    def test_urls_availability(self):
         client_statuses = (
-            (self.author_client, HTTPStatus.OK),
-            (self.stranger_client, HTTPStatus.NOT_FOUND),
+            (self.author_client, HTTPStatus.OK, HTTPStatus.OK, HTTPStatus.OK),
+            (self.stranger_client, HTTPStatus.NOT_FOUND, HTTPStatus.OK,
+             HTTPStatus.OK),
+            (self.client, HTTPStatus.FOUND, HTTPStatus.FOUND, HTTPStatus.OK)
         )
-        urls = (self.url_edit, self.url_delete, self.url_detail)
-        for client, status in client_statuses:
-            for url in urls:
+        url_1 = (self.url_edit, self.url_delete, self.url_detail)
+        url_2 = (URL_ADD, URL_LIST, URL_DONE)
+        url_3 = (URL_HOME, URL_LOGIN, URL_LOGOUT, URL_SIGNUP)
+        for url in (url_1 + url_2 + url_3):
+            for client, status_1, status_2, status_3 in client_statuses:
                 with self.subTest():
                     response = client.get(url)
-                    self.assertEqual(response.status_code, status)
+                    if url in url_1:
+                        self.assertEqual(response.status_code, status_1)
+                    elif url in url_2:
+                        self.assertEqual(response.status_code, status_2)
+                    else:
+                        self.assertEqual(response.status_code, status_3)
 
     def test_redirect_for_anonymous_client(self):
         urls = (self.url_edit, self.url_delete, self.url_detail,

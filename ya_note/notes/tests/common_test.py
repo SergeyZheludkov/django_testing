@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from notes.models import Note
 
@@ -13,13 +13,13 @@ FIRST_SLUG = 'slug_1'
 NEW_NOTE_TITLE = 'Title revised'
 NEW_NOTE_TEXT = 'Text revised'
 NEW_NOTE_SLUG = 'Slug_revised'
-URL_ADD = reverse('notes:add')
-URL_DONE = reverse('notes:success')
-URL_HOME = reverse('notes:home')
-URL_LIST = reverse('notes:list')
-URL_LOGIN = reverse('users:login')
-URL_LOGOUT = reverse('users:logout')
-URL_SIGNUP = reverse('users:signup')
+URL_ADD = reverse_lazy('notes:add')
+URL_DONE = reverse_lazy('notes:success')
+URL_HOME = reverse_lazy('notes:home')
+URL_LIST = reverse_lazy('notes:list')
+URL_LOGIN = reverse_lazy('users:login')
+URL_LOGOUT = reverse_lazy('users:logout')
+URL_SIGNUP = reverse_lazy('users:signup')
 
 
 class SetUpTestData(TestCase):
@@ -35,9 +35,9 @@ class SetUpTestData(TestCase):
         cls.note = Note.objects.create(title=NOTE_TITLE, text=NOTE_TEXT,
                                        slug=FIRST_SLUG, author=cls.author,)
         cls.form_data = {'title': NOTE_TITLE, 'text': NOTE_TEXT,
-                         'slug': NOTE_SLUG, 'author': cls.author}
+                         'slug': NOTE_SLUG}
         cls.form_data_same = {'title': NOTE_TITLE, 'text': NOTE_TEXT,
-                              'slug': FIRST_SLUG, 'author': cls.author}
+                              'slug': FIRST_SLUG}
         cls.form_data_new = {'title': NEW_NOTE_TITLE,
                              'text': NEW_NOTE_TEXT, 'slug': NEW_NOTE_SLUG}
         cls.url_edit = reverse('notes:edit', args=(cls.note.slug,))

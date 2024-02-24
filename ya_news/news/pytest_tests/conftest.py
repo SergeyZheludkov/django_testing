@@ -8,6 +8,10 @@ from django.urls import reverse
 from news.models import Comment, News
 
 
+FORM_DATA = {'text': 'Текст комментария'}
+FORM_DATA_NEW = {'text': 'Обновленный комментария'}
+
+
 @pytest.fixture(autouse=True)
 def db_set_up(db):
     """Ensuring the Django database is set up."""
@@ -43,24 +47,9 @@ def news():
 
 
 @pytest.fixture
-def news_id(news):
-    return (news.id,)
-
-
-@pytest.fixture
-def form_data():
-    return {'text': 'Текст комментария'}
-
-
-@pytest.fixture
-def form_data_new():
-    return {'text': 'Обновленный комментария'}
-
-
-@pytest.fixture
-def comment(news, author, form_data):
+def comment(news, author):
     return Comment.objects.create(news=news, author=author,
-                                  text=form_data['text'])
+                                  text=FORM_DATA['text'])
 
 
 @pytest.fixture
@@ -84,8 +73,8 @@ def comments_bulk_creation(news, author):
 
 
 @pytest.fixture
-def detail_url(news_id):
-    return reverse('news:detail', args=news_id)
+def detail_url(news):
+    return reverse('news:detail', args=(news.id,))
 
 
 @pytest.fixture

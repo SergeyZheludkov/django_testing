@@ -20,9 +20,7 @@ class TestLogic(SetUpTestData):
 
     def test_user_can_create_note(self):
         initial_notes_count = Note.objects.count()
-        pk_list = []
-        for note in Note.objects.all():
-            pk_list.append(note.pk)
+        pk_list = [note.pk for note in Note.objects.all()]
         response = self.author_client.post(URL_ADD, data=self.form_data)
         self.assertRedirects(response, URL_DONE)
         self.assertEqual(Note.objects.count(), initial_notes_count + 1)
@@ -30,7 +28,7 @@ class TestLogic(SetUpTestData):
         self.assertEqual(note.title, self.form_data['title'])
         self.assertEqual(note.text, self.form_data['text'])
         self.assertEqual(note.slug, self.form_data['slug'])
-        self.assertEqual(note.author, self.form_data['author'])
+        self.assertEqual(note.author, self.author)
 
     def test_prohibition_the_same_slug(self):
         initial_notes_count = Note.objects.count()
@@ -60,6 +58,7 @@ class TestLogic(SetUpTestData):
         self.assertEqual(Note.objects.count(), initial_notes_count - 1)
 
     def test_author_can_edit_note(self):
+        initial_notes_count = Note.objects.count()
         response = self.author_client.post(self.url_edit,
                                            data=self.form_data_new)
         self.assertRedirects(response, URL_DONE)
@@ -67,6 +66,7 @@ class TestLogic(SetUpTestData):
         self.assertEqual(note.title, self.form_data_new['title'])
         self.assertEqual(note.text, self.form_data_new['text'])
         self.assertEqual(note.slug, self.form_data_new['slug'])
+        self.assertEqual(Note.objects.count(), initial_notes_count)
 
     def test_user_cant_delete_and_edit__note_of_another_user(self):
         for url in (self.url_delete, self.url_edit):
